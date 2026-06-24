@@ -1,20 +1,33 @@
-from pokemon import Pokemon
+from pokeapi import get_pokemon
 from battle import battle
 
-pikachu = Pokemon(
-    "Pikachu",
-    hp=100,
-    attack=25,
-    defense=10,
-    speed=30
-)
+name1 = input("Pokemon 1: ").strip()
+name2 = input("Pokemon 2: ").strip()
 
-charizard = Pokemon(
-    "Charizard",
-    hp=120,
-    attack=30,
-    defense=15,
-    speed=20
-)
+if not name1 or not name2:
+    print("Please enter two Pokemon names.")
+else:
+    pokemon1 = get_pokemon(name1)
+    pokemon2 = get_pokemon(name2)
 
-battle(pikachu, charizard)
+    if not pokemon1 or not pokemon2:
+        print("Pokemon not found.")
+    else:
+        print("\nLoaded Pokemon:")
+        print(
+            pokemon1.name,
+            pokemon1.hp,
+            pokemon1.attack,
+            pokemon1.defense,
+            pokemon1.speed
+        )
+
+        print(
+            pokemon2.name,
+            pokemon2.hp,
+            pokemon2.attack,
+            pokemon2.defense,
+            pokemon2.speed
+        )
+
+        battle(pokemon1, pokemon2)

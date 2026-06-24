@@ -1,50 +1,51 @@
 def calculate_damage(attacker, defender):
     damage = attacker.attack - (defender.defense // 2)
 
-    if damage < 1:
-        damage = 1
+    return max(1, damage)
 
-    return damage
+def battle(p1, p2):
 
-
-def attack(attacker, defender):
-    damage = calculate_damage(attacker, defender)
-
-    defender.take_damage(damage)
-
-    print(
-        f"{attacker.name} attacks {defender.name} "
-        f"for {damage} damage!"
-    )
-
-    print(f"{defender.name} HP: {defender.hp}\n")
-
-
-def battle(pokemon1, pokemon2):
-    print(f"\n{pokemon1.name} VS {pokemon2.name}\n")
-
-    if pokemon1.speed >= pokemon2.speed:
-        first = pokemon1
-        second = pokemon2
+    if p1.speed >= p2.speed:
+        first = p1
+        second = p2
     else:
-        first = pokemon2
-        second = pokemon1
+        first = p2
+        second = p1
+
+    print(f"\n{p1.name} VS {p2.name}\n")
 
     turn = 1
 
-    while pokemon1.is_alive() and pokemon2.is_alive():
+    while p1.is_alive() and p2.is_alive():
 
-        print(f"--- Turn {turn} ---")
+        print(f"Turn {turn}")
 
-        attack(first, second)
+        damage = calculate_damage(first, second)
+        second.take_damage(damage)
+
+        print(
+            f"{first.name} attacks "
+            f"{second.name} for {damage}"
+        )
 
         if not second.is_alive():
             break
 
-        attack(second, first)
+        damage = calculate_damage(second, first)
+        first.take_damage(damage)
+
+        print(
+            f"{second.name} attacks "
+            f"{first.name} for {damage}"
+        )
+
+        print(
+            f"{first.name}: {first.hp} HP | "
+            f"{second.name}: {second.hp} HP\n"
+        )
 
         turn += 1
 
-    winner = pokemon1 if pokemon1.is_alive() else pokemon2
+    winner = p1 if p1.is_alive() else p2
 
-    print(f"{winner.name} wins!")
+    print(f"\nWinner: {winner.name}")
