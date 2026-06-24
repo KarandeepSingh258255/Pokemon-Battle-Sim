@@ -75,7 +75,11 @@ def get_local_strategy(battle_state):
     opponent = battle_state["opponent"]
     player_hp_ratio = player["hp"] / player["max_hp"]
     opponent_hp_ratio = opponent["hp"] / opponent["max_hp"]
-    best_move = max(player["moves"], key=lambda move: move["power"])
+   
+    def score_move(move):
+        return move["power"] * move["accuracy"] / 100
+    
+    best_move = max(player["moves"], key=score_move)
 
     if player_hp_ratio >= opponent_hp_ratio:
         status = "You are currently ahead."
@@ -83,8 +87,9 @@ def get_local_strategy(battle_state):
         status = "You are currently behind."
 
     return (
-        f"{status} Use {best_move['name']} because it has the highest "
-        f"power available ({best_move['power']})."
-    )
+        f"{status} Use {best_move['name']} because it has "
+        f"{best_move['power']} power, {best_move['accuracy']} accuracy, "
+        f"and {best_move['priority']} priority."
+    )    
 
 

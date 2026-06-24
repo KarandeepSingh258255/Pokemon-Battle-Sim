@@ -30,11 +30,35 @@ def get_pokemon(name):
         try: 
             move_data = requests.get(move_url, timeout=10).json()
             power = move_data.get("power")
-            if power is None:
-                power = 10
+            accuracy = move_data.get("accuracy")
+            pp = move_data.get("pp")
+            priority = move_data.get("priority")
+            move_type = move_data["type"]["name"]
+            damage_class = move_data["damage_class"]["name"]
+    
         except requests.RequestException:
             power = 10
-        moves.append({"name": move_name, "power": power})
+            accuracy = 100
+            pp = 10
+            priority = 0
+            move_type = "normal"
+            damage_class = "physical"
+
+        if power is None:
+            power = 10
+
+        if accuracy is None:
+            accuracy = 100
+
+        moves.append({
+            "name": move_name,
+            "power": power,
+            "accuracy": accuracy,
+            "pp": pp,
+            "priority": priority,
+            "type": move_type,
+            "damage_class": damage_class
+        })
     return Pokemon(
         data["name"],
         hp,
