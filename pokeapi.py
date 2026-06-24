@@ -22,10 +22,24 @@ def get_pokemon(name):
     defense = data["stats"][2]["base_stat"]
     speed = data["stats"][5]["base_stat"]
 
+    moves = []
+    for move_entry in data["moves"][:4]:
+        move_name = move_entry["move"]["name"]
+        move_url = move_entry["move"]["url"]
+
+        try: 
+            move_data = requests.get(move_url, timeout=10).json()
+            power = move_data.get("power")
+            if power is None:
+                power = 10
+        except requests.RequestException:
+            power = 10
+        moves.append({"name": move_name, "power": power})
     return Pokemon(
         data["name"],
         hp,
         attack,
         defense,
-        speed
+        speed,
+        moves=moves
     )

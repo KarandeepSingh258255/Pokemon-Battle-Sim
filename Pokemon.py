@@ -1,11 +1,16 @@
+import math
+
+
 class Pokemon:
-    def __init__(self, name, hp, attack, defense, speed):
+    def __init__(self, name, hp, attack, defense, speed, moves=None):
         self.name = name.title()
-        self.max_hp = hp
-        self.hp = hp
-        self.attack = attack
-        self.defense = defense
-        self.speed = speed
+        self.level = 50
+        self.max_hp = math.floor((2 * hp * self.level) / 100) + self.level + 10 
+        self.hp = self.max_hp
+        self.attack = math.floor((2 *attack * self.level) / 100) + self.level + 5
+        self.defense = math.floor((2 * defense * self.level) / 100) + self.level + 5 
+        self.speed = math.floor((2 * speed * self.level) / 100) + self.level + 5
+        self.moves = moves if moves else []
 
     def is_alive(self):
         return self.hp > 0
