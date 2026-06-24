@@ -1,6 +1,5 @@
 import math
 
-
 class Pokemon:
     def __init__(self, name, hp, attack, defense, speed, moves=None):
         self.name = name.title()

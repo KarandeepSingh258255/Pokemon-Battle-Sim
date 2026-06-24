@@ -1,5 +1,6 @@
-import math 
+import math
 import random
+from ai_helper import get_strategy
 
 def calculate_damage(attacker, defender, move):
     level = 50 
@@ -35,6 +36,36 @@ def followup_attack(attacker, defender, move):
         print("Critical hit!")
     print(f"It dealt {damage} damage.")
 
+
+def show_strategy(turn, player, opponent):
+    battle_state = {
+        "turn": turn,
+        "your_pokemon": {
+            "name": player.name,
+            "hp": player.hp,
+            "max_hp": player.max_hp,
+            "attack": player.attack,
+            "defense": player.defense,
+            "speed": player.speed,
+            "moves": player.moves,
+        },
+        "opponent": {
+            "name": opponent.name,
+            "hp": opponent.hp,
+            "max_hp": opponent.max_hp,
+            "attack": opponent.attack,
+            "defense": opponent.defense,
+            "speed": opponent.speed,
+            "moves": opponent.moves,
+        },
+    }
+
+    try:
+        print("\nStrategy:")
+        print(get_strategy(battle_state))
+    except Exception as error:
+        print(f"\nStrategy unavailable: {error}")
+
 def battle(p1, p2):
     print(f"\n {p1.name} vs {p2.name}\n")
     turn = 1 
@@ -42,6 +73,8 @@ def battle(p1, p2):
     while p1.is_alive() and p2.is_alive():
         print(f"\n Turn: {turn}")
         print(f"{p1.name}: {p1.hp}/{p1.max_hp} HP | {p2.name}: {p2.hp}/{p2.max_hp} HP")
+
+        show_strategy(turn, p1, p2)
 
         p1move= move_menu(p1)
     
@@ -58,8 +91,11 @@ def battle(p1, p2):
 
         damage, crit = calculate_damage(first, second, f_move)
         second.take_damage(damage)
+
         print(f"\n{first.name} used {f_move['name']} on {second.name}.")
-        followup_attack(first, second, f_move)
+        if crit:
+            print("Critical hit!")
+        print(f"It dealt {damage} damage.")
         
         if not second.is_alive():
             break 

@@ -43,3 +43,15 @@ def get_pokemon(name):
         speed,
         moves=moves
     )
+
+def get_pokemon_names():
+    url = "https://pokeapi.co/api/v2/pokemon?limit=2000"
+
+    try: 
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+    except requests.RequestException:
+        return []
+    
+    data = response.json()
+    return [pokemon["name"] for pokemon in data["results"]]
