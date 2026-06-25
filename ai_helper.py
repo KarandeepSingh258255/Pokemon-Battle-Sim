@@ -8,12 +8,19 @@ from pokeapi import get_type_multiplier
 load_dotenv()
 
 api_key = os.getenv("GEMINI_API_KEY")
-client = genai.Client(api_key=api_key) if api_key else None
+client = (
+    genai.Client(api_key=api_key, http_options={"timeout": 8_000})
+    if api_key
+    else None
+)
 
 
 def ask_gemini(prompt):
     if not client:
         return "Gemini API key is missing. Add GEMINI_API_KEY to your .env file."
+
+    if not api_key.startswith("AIza"):
+        return "Gemini API key does not look valid. Create a Gemini API key in Google AI Studio."
 
     try:
         interaction = client.interactions.create(
@@ -100,5 +107,4 @@ def get_local_strategy(battle_state):
         f"{best_move['power']} power, {best_move['accuracy']} accuracy, "
         f"and {best_move['priority']} priority."
     )    
-
 
