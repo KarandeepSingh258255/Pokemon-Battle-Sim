@@ -1,20 +1,20 @@
 import math
 import random
 from ai_helper import get_strategy
+from pokeapi import get_type_multiplier
 
 def calculate_damage(attacker, defender, move):
-    level = 50 
+    level = 50
     level_calc = (2 * level) / 5 + 2
     ratio = attacker.attack / defender.defense
-    base = ((level_calc * move['power'] * ratio) / 50) + 2
-    type_multiplier = get_type_multiplier(move["type"],defender.types)
-    total_damage = math.floor(base * variance * crit_damage * type_multiplier)
+    base = ((level_calc * move["power"] * ratio) / 50) + 2
 
     variance = random.uniform(0.85, 1.0)
-    
-    crit = random.randint(1,24) == 1
-    crit_damage =  1.5 if crit else 1.0
-    total_damage = math.floor(base * variance * crit_damage)
+    crit = random.randint(1, 24) == 1
+    crit_damage = 1.5 if crit else 1.0
+    type_multiplier = get_type_multiplier(move["type"], defender.types)
+
+    total_damage = math.floor(base * variance * crit_damage * type_multiplier)
 
     return max(1, total_damage), crit, type_multiplier
 
@@ -31,7 +31,7 @@ def move_menu(pokemon):
 
 def followup_attack(attacker, defender, move):
     print(f"\n{attacker.name} is about to use {move['name']} on {defender.name}.")
-    damage, crit = calculate_damage(attacker, defender, move)
+    damage, crit, type_multiplier = calculate_damage(attacker, defender, move)    
     defender.take_damage(damage)
 
     if crit: 
@@ -59,6 +59,7 @@ def show_strategy(turn, player, opponent):
             "defense": opponent.defense,
             "speed": opponent.speed,
             "moves": opponent.moves,
+            "types": opponent.types
         },
     }
 
@@ -91,7 +92,7 @@ def battle(p1, p2):
             random.shuffle(contestors)
             (first, f_move), (second, s_move) = contestors
 
-        damage, crit = calculate_damage(first, second, f_move)
+        damage, crit, type_multiplier = calculate_damage(first, second, f_move)
         second.take_damage(damage)
 
         print(f"\n{first.name} used {f_move['name']} on {second.name}.")
@@ -101,8 +102,8 @@ def battle(p1, p2):
         
         if not second.is_alive():
             break 
-
-        damage, crit = calculate_damage(second, first, s_move)
+        
+        damage, crit, type_multiplier = calculate_damage(second, first, s_move)
         first.take_damage(damage)
         print(f"\n{second.name} used {s_move['name']} it hit for {damage}!.")
 

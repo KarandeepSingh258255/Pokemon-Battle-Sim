@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from google import genai
 import os
 from rapidfuzz import process
+from pokeapi import get_type_multiplier
 
 
 load_dotenv()
@@ -50,6 +51,8 @@ Return only the Pokemon name. No explanation.
 def get_strategy(battle_state):
     local_advice = get_local_strategy(battle_state)
     prompt = f"""
+
+    
 You are helping a player in a simple Pokemon battle simulator.
 
 Battle state:
@@ -61,6 +64,7 @@ Mention:
 1. who is winning
 2. which move the user should choose
 3. why
+"types": opponent.types
 """
     gemini_advice = ask_gemini(prompt)
 
@@ -77,7 +81,12 @@ def get_local_strategy(battle_state):
     opponent_hp_ratio = opponent["hp"] / opponent["max_hp"]
    
     def score_move(move):
-        return move["power"] * move["accuracy"] / 100
+        power = move.get("power", 10)
+        accuracy = move.get("accuracy", 100)
+        priority = move.get("priority", 0)
+        type_multiplier = get_type_multiplier(move.get("type"), opponent["types"])
+
+        return (power * type_multiplier * (accuracy / 100)) + (priority * 10)
     
     best_move = max(player["moves"], key=score_move)
 
