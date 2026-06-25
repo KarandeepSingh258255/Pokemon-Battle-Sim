@@ -7,6 +7,8 @@ def calculate_damage(attacker, defender, move):
     level_calc = (2 * level) / 5 + 2
     ratio = attacker.attack / defender.defense
     base = ((level_calc * move['power'] * ratio) / 50) + 2
+    type_multiplier = get_type_multiplier(move["type"],defender.types)
+    total_damage = math.floor(base * variance * crit_damage * type_multiplier)
 
     variance = random.uniform(0.85, 1.0)
     
@@ -14,7 +16,7 @@ def calculate_damage(attacker, defender, move):
     crit_damage =  1.5 if crit else 1.0
     total_damage = math.floor(base * variance * crit_damage)
 
-    return max(1, total_damage), crit
+    return max(1, total_damage), crit, type_multiplier
 
 def move_menu(pokemon):
     print(f"\nwhat move will {pokemon.name} use?")

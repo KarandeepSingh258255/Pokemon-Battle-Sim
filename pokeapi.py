@@ -14,6 +14,7 @@ def get_pokemon(name):
 
     try:
         data = response.json()
+        types = [type_info["type"]["name"] for type_info in data["types"]]
     except ValueError:
         return None
 
@@ -65,8 +66,25 @@ def get_pokemon(name):
         attack,
         defense,
         speed,
-        moves=moves
+        moves=moves,
+        types=types
     )
+
+    TYPE_EFFECTIVENESS = {
+        "fire": {"water": 0.5, "grass": 2.0, "ice": 2.0, "bug": 2.0, "steel": 2.0, "dragon": 0.5},
+        "water": {"fire": 2.0, "grass": 0.5, "ice": 2.0, "bug": 0.5, "steel": 2.0, "dragon": 0.5},
+        "grass": {"fire": 0.5, "water": 2.0, "ice": 0.5, "bug": 0.5, "steel": 0.5, "dragon": 0.5},
+        "ice": {"fire": 0.5, "water": 0.5, "grass": 2.0, "bug": 2.0, "steel": 1.0, "dragon": 2.0}
+    }
+
+
+    def get_type_multiplier(move_type, defender_types):
+        mulitplier = 1
+
+        for defender_type in defender_types:
+            multiplier *= TYPE_EFFECTIVENESS.get(move_type, {}).get(defender_type, 1.0)
+
+        return multiplier
 
 def get_pokemon_names():
     url = "https://pokeapi.co/api/v2/pokemon?limit=2000"
@@ -79,3 +97,5 @@ def get_pokemon_names():
     
     data = response.json()
     return [pokemon["name"] for pokemon in data["results"]]
+
+# fully implement the type advantages to fix the AI 
