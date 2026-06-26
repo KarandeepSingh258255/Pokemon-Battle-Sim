@@ -36,6 +36,12 @@ def get_pokemon(name):
             priority = move_data.get("priority")
             move_type = move_data["type"]["name"]
             damage_class = move_data["damage_class"]["name"]
+            move_meta = move_data.get("meta") or {}
+            ailment = move_meta.get("ailment") or {}
+            status = ailment.get("name")
+            status_chance = move_meta.get("ailment_chance") or 0
+            if damage_class == "status" and status not in (None, "none") and status_chance == 0:
+                status_chance = 100
     
         except requests.RequestException:
             power = 10
@@ -44,6 +50,8 @@ def get_pokemon(name):
             priority = 0
             move_type = "normal"
             damage_class = "physical"
+            status = "none"
+            status_chance = 0
 
         if power is None:
             power = 10
@@ -58,7 +66,9 @@ def get_pokemon(name):
             "pp": pp,
             "priority": priority,
             "type": move_type,
-            "damage_class": damage_class
+            "damage_class": damage_class,
+            "status": status,
+            "status_chance": status_chance
         })
     return Pokemon(
         data["name"],

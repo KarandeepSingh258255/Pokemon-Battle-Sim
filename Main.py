@@ -8,10 +8,10 @@ def load_pokemon(name, valid_names):
     if pokemon:
         return pokemon
     
-    guessed_name = fuzzy_guess(name, valid_pokemon_names)
+    guessed_name = fuzzy_guess(name, valid_names)
 
-    if not guessed_name and valid_pokemon_names:
-        guessed_name = guess_pokemon_with_ai(name, valid_pokemon_names)
+    if not guessed_name and valid_names:
+        guessed_name = guess_pokemon_with_ai(name, valid_names)
 
         if guessed_name:
             print(f"Using closest match: {guessed_name.title()}")
@@ -19,36 +19,41 @@ def load_pokemon(name, valid_names):
 
     return None
 
-valid_pokemon_names = get_pokemon_names()
+def main():
+    valid_pokemon_names = get_pokemon_names()
 
-name1 = input("Pokemon 1: ").strip()
-name2 = input("Pokemon 2: ").strip()
+    name1 = input("Pokemon 1: ").strip()
+    name2 = input("Pokemon 2: ").strip()
 
-if not name1 or not name2:
-    print("Please enter two Pokemon names.")
-else:
-    pokemon1 = load_pokemon(name1, valid_pokemon_names)
-    pokemon2 = load_pokemon(name2, valid_pokemon_names)
-
-    if not pokemon1 or not pokemon2:
-        print("Pokemon not found.")
+    if not name1 or not name2:
+        print("Please enter two Pokemon names.")
     else:
-        print("\nLoaded Pokemon:")
-        print(
-            pokemon1.name,
-            pokemon1.hp,
-            pokemon1.attack,
-            pokemon1.defense,
-            pokemon1.speed
-        )
+        pokemon1 = load_pokemon(name1, valid_pokemon_names)
+        pokemon2 = load_pokemon(name2, valid_pokemon_names)
 
-        print(
-            pokemon2.name,
-            pokemon2.hp,
-            pokemon2.attack,
-            pokemon2.defense,
-            pokemon2.speed
-        )
+        if not pokemon1 or not pokemon2:
+            print("Pokemon not found.")
+        else:
+            print("\nLoaded Pokemon:")
+            print(
+                pokemon1.name,
+                pokemon1.hp,
+                pokemon1.attack,
+                pokemon1.defense,
+                pokemon1.speed
+            )
 
-        battle(pokemon1, pokemon2)
+            print(
+                pokemon2.name,
+                pokemon2.hp,
+                pokemon2.attack,
+                pokemon2.defense,
+                pokemon2.speed
+            )
+
+            battle(pokemon1, pokemon2)
+
+
+if __name__ == "__main__":
+    main()
 

@@ -71,6 +71,8 @@ Mention:
 1. who is winning
 2. which move the user should choose
 3. why
+Do not keep suggesting a status move if the opponent already has a status.
+If multiple moves are similarly useful, vary the suggestion based on the turn.
 "types": opponent.types
 """
     gemini_advice = ask_gemini(prompt)
@@ -84,6 +86,7 @@ Mention:
 def get_local_strategy(battle_state):
     player = battle_state["your_pokemon"]
     opponent = battle_state["opponent"]
+    turn = battle_state.get("turn", 1)
     player_hp_ratio = player["hp"] / player["max_hp"]
     opponent_hp_ratio = opponent["hp"] / opponent["max_hp"]
    
@@ -92,19 +95,67 @@ def get_local_strategy(battle_state):
         accuracy = move.get("accuracy", 100)
         priority = move.get("priority", 0)
         type_multiplier = get_type_multiplier(move.get("type"), opponent["types"])
+        status_bonus = 0
+        expected_damage = power * type_multiplier * (accuracy / 100)
 
-        return (power * type_multiplier * (accuracy / 100)) + (priority * 10)
+        if not opponent.get("status") and opponent_hp_ratio > 0.5 and move.get("status") not in (None, "none"):
+            status_bonus = min(25, move.get("status_chance", 0) * 0.25)
+
+        if opponent_hp_ratio <= 0.3:
+            status_bonus = 0
+
+        return expected_damage + (priority * 10) + status_bonus
+
+    def move_reason(move):
+        type_multiplier = get_type_multiplier(move.get("type"), opponent["types"])
+
+        if opponent_hp_ratio <= 0.3:
+            return "the opponent is low, so damage matters most right now"
+
+        if not opponent.get("status") and move.get("status") not in (None, "none"):
+            return (
+                f"it can cause {move['status']} and still does useful damage"
+            )
+
+        if type_multiplier > 1:
+            return "it is strong against the opponent's type"
+
+        return (
+            f"it has {move['power']} power, {move['accuracy']} accuracy, "
+            f"and {move['priority']} priority"
+        )
     
-    best_move = max(player["moves"], key=score_move)
+    scored_moves = sorted(
+        ((score_move(move), move) for move in player["moves"]),
+        key=lambda item: item[0],
+        reverse=True
+    )
+    best_score = scored_moves[0][0]
+    close_moves = [
+        move for score, move in scored_moves
+        if best_score - score <= max(5, best_score * 0.15)
+    ]
+    best_move = close_moves[(turn - 1) % len(close_moves)]
 
     if player_hp_ratio >= opponent_hp_ratio:
         status = "You are currently ahead."
     else:
         status = "You are currently behind."
 
-    return (
-        f"{status} Use {best_move['name']} because it has "
-        f"{best_move['power']} power, {best_move['accuracy']} accuracy, "
-        f"and {best_move['priority']} priority."
-    )    
+    status_note = ""
+    if player.get("status"):
+        status_note = f" Your Pokemon is {player['status']}, so be careful."
+    elif opponent.get("status"):
+        status_note = f" The opponent is {opponent['status']}, which helps you."
 
+    move_status_note = ""
+    if best_move.get("status") not in (None, "none") and move_reason(best_move).startswith("it can"):
+        move_status_note = (
+            f" It has a {best_move.get('status_chance', 0)}% chance "
+            f"to cause {best_move['status']}."
+        )
+
+    return (
+        f"{status}{status_note} Use {best_move['name']} because "
+        f"{move_reason(best_move)}.{move_status_note}"
+    )    

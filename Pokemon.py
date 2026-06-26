@@ -11,6 +11,9 @@ class Pokemon:
         self.speed = math.floor((2 * speed * self.level) / 100) + self.level + 5
         self.moves = moves if moves else []
         self.types = types if types else []
+        self.status = None
+        self.sleep_turns = 0
+
     def is_alive(self):
         return self.hp > 0
 
@@ -19,4 +22,14 @@ class Pokemon:
 
     def heal(self, amount):
         self.hp = min(self.max_hp, self.hp + amount)
+
+    def set_status(self, status):
+        if self.status:
+            return False
+
+        self.status = status
+        if status == "asleep":
+            self.sleep_turns = 2
+
+        return True
     
