@@ -36,19 +36,19 @@ def main():
         else:
             print("\nLoaded Pokemon:")
             print(
-                pokemon1.name,
-                pokemon1.hp,
-                pokemon1.attack,
-                pokemon1.defense,
-                pokemon1.speed
+              "name: " + pokemon1.name,
+                "hp: " + str(pokemon1.hp),
+                "attack: " + str(pokemon1.attack),
+                "defense: " + str(pokemon1.defense),
+                "speed: " + str(pokemon1.speed)
             )
 
             print(
-                pokemon2.name,
-                pokemon2.hp,
-                pokemon2.attack,
-                pokemon2.defense,
-                pokemon2.speed
+                "name: " + pokemon2.name,
+                "hp: " + str(pokemon2.hp),
+                "attack: " + str(pokemon2.attack),
+                "defense: " + str(pokemon2.defense),
+                "speed: " + str(pokemon2.speed)
             )
 
             battle(pokemon1, pokemon2)
